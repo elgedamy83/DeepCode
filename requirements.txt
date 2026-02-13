@@ -21,3 +21,7 @@ reportlab>=3.5.0
 streamlit
 uvicorn>=0.24.0
 websockets>=12.0
+
+# AI / ML CPU-friendly
+torch>=2.0.1+cpu --index-url https://download.pytorch.org/whl/cpu
+transformers>=4.28.0
