@@ -1,9 +1,11 @@
+version: '3.9'
+
 services:
   deepcode:
     build:
       context: ..
       dockerfile: deepcode_docker/Dockerfile
-    container_name: deepcode
+    container_name: deepcode_cpu
     ports:
       - "8000:8000"
     volumes:
@@ -15,20 +17,28 @@ services:
       - ../deepcode_lab:/app/deepcode_lab
       - ../uploads:/app/uploads
       - ../logs:/app/logs
+
+      # Optional BRD input/output folders
+      - ../deepcode_input:/app/deepcode_input
+      - ../generated_app:/app/generated_app
+
     environment:
       - DEEPCODE_ENV=docker
       - DEEPCODE_PORT=8000
+      - PYTHONUNBUFFERED=1
+      # Optional: set API keys if needed
+      - DEEPCODE_API_KEY=${DEEPCODE_API_KEY}
     restart: unless-stopped
 
   nanobot:
     build:
       context: ..
       dockerfile: nanobot/Dockerfile
-    container_name: nanobot
+    container_name: nanobot_cpu
     ports:
       - "18790:18790"
     volumes:
-      # nanobot configuration (飞书/Telegram token 等)
+      # Nanobot configuration
       - ../nanobot_config.json:/root/.nanobot/config.json:ro
 
       # Persistent workspace data
@@ -40,7 +50,7 @@ services:
     environment:
       - NANOBOT_ENV=docker
       # Internal API URL for nanobot -> DeepCode communication
-      - DEEPCODE_API_URL=http://deepcode:8000
+      - DEEPCODE_API_URL=http://deepcode_cpu:8000
     depends_on:
       - deepcode
     restart: unless-stopped
